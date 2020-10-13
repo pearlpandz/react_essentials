@@ -1,0 +1,13 @@
+*:focus {
+  box-sizing: border-box;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.flex {
+  display: flex;
+}
+
+.m-r-5 {
+  margin-right: 5px
+}
