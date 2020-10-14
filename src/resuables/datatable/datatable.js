@@ -13,9 +13,9 @@ import { Calendar } from 'primereact/calendar';
 import { MultiSelect } from 'primereact/multiselect';
 import { ProgressBar } from 'primereact/progressbar';
 import { Tooltip } from 'primereact/tooltip';
+import { Toast } from 'primereact/toast';
 
 import './datatable.css';
-
 
 export class PrefixDataTable extends Component {
 
@@ -23,6 +23,7 @@ export class PrefixDataTable extends Component {
         super(props);
         this.state = {
             data: null,
+            expandedRows: null,
             columns: null,
             selectedCustomers: null,
             globalFilter: null,
@@ -30,6 +31,8 @@ export class PrefixDataTable extends Component {
             dateFilter: null,
             selectedStatus: null
         };
+
+        this.showSuccess = this.showSuccess.bind(this);
 
         this.representatives = [
             { name: "Amy Elsner" },
@@ -67,30 +70,38 @@ export class PrefixDataTable extends Component {
 
         // export
         this.exportCSV = this.exportCSV.bind(this);
+
+        // expand
+        this.onRowExpand = this.onRowExpand.bind(this);
     }
 
     componentDidMount() {
-        const { data, columns } = this.props;
-        this.setState({
-            data, columns
-        })
+
     }
 
     renderHeader() {
+        const { heading, isExport, isGlobalSearch } = this.props;
         return (
             <div className="table-header">
-                <h4 className="p-mr-2 margin-zero">List of Customers</h4>
+                <h4 className="p-mr-2 margin-zero">{heading}</h4>
                 <div className="flex">
-                    <div className="flex m-r-5">
-                        <Button type="Button" icon="pi pi-file-excel" className="m-r-5" onClick={this.exportCSV} tooltip="Export as CSV" tooltipOptions={{ position: 'bottom', mouseTrack: true, mouseTrackTop: 15 }} />
-                        <Button type="Button" icon="pi pi-file-pdf" className="m-r-5 p-button-danger" onClick={this.exportPdf} tooltip="Export as PDF" tooltipOptions={{ position: 'bottom', mouseTrack: true, mouseTrackTop: 15 }} />
-                        <Tooltip target=".logo" mouseTrack mouseTrackLeft={10}/>
-                    </div>
-
-                    <span className="p-input-icon-left">
-                        <i className="pi pi-search" />
-                        <InputText type="search" onInput={(e) => this.setState({ globalFilter: e.target.value })} placeholder="Global Search" />
-                    </span>
+                    {
+                        isExport ?
+                            <div className="flex m-r-5">
+                                <Button type="Button" icon="pi pi-file-excel" className="m-r-5" onClick={this.exportCSV} tooltip="Export as CSV" tooltipOptions={{ position: 'bottom', mouseTrack: true, mouseTrackTop: 15 }} />
+                                <Button type="Button" icon="pi pi-file-pdf" className="m-r-5 p-button-danger" onClick={this.exportPdf} tooltip="Export as PDF" tooltipOptions={{ position: 'bottom', mouseTrack: true, mouseTrackTop: 15 }} />
+                                <Tooltip target=".logo" mouseTrack mouseTrackLeft={10} />
+                            </div>
+                            : ''
+                    }
+                    {
+                        isGlobalSearch ?
+                            <span className="p-input-icon-left">
+                                <i className="pi pi-search" />
+                                <InputText type="search" onInput={(e) => this.setState({ globalFilter: e.target.value })} placeholder="Global Search" />
+                            </span>
+                            : ''
+                    }
                 </div>
             </div>
         );
@@ -131,7 +142,7 @@ export class PrefixDataTable extends Component {
         return (
             <React.Fragment>
                 <span className="p-column-title">Status</span>
-                <span className={classNames('customer-badge', 'status-' + rowData.status)}>{rowData.status}</span>
+                <span className={classNames('badge', 'status-' + rowData.status.toLowerCase())}>{rowData.status}</span>
             </React.Fragment>
         );
     }
@@ -245,7 +256,7 @@ export class PrefixDataTable extends Component {
 
     statusItemTemplate(option) {
         return (
-            <span className={classNames('customer-badge', 'status-' + option)}>{option}</span>
+            <span className={classNames('badge', 'status-' + option.toLowerCase())}>{option}</span>
         );
     }
 
@@ -254,35 +265,74 @@ export class PrefixDataTable extends Component {
         this.setState({ selectedStatus: event.value });
     }
 
+    onColReorder = () => {
+        this.showSuccess('Column Reordered')
+    }
+
+    showSuccess = (msg) => {
+        this.toast.show({
+            severity: 'success',
+            summary: 'Success Message',
+            detail: msg,
+            life: 3000
+        });
+    }
+
+    onRowExpand(event) {
+        this.toast.show({ severity: 'info', summary: 'User Expanded', detail: event.data.name, life: 3000 });
+    }
+
+    rowExpansionTemplate(data) {
+        return (
+            <div className="orders-subtable">
+                <h4 className="m-t-0">Orders for {data.name}</h4>
+                <DataTable value={data.orders}>
+                    <Column key="id" field="id" header="Id" />
+                    <Column key="customer" field="customer" header="Customer" />
+                    <Column key="date" field="date" header="Date" />
+                    <Column key="amount" field="amount" header="Amount" body={this.amountBodyTemplate} />
+                    <Column key="status" field="status" header="Status" body={this.statusItemTemplate} />
+                    <Column headerStyle={{ width: '4rem' }} body={this.searchBodyTemplate} />
+                </DataTable>
+            </div>
+        );
+    }
+
+
     render() {
         const header = this.renderHeader();
         const dateFilter = this.renderDateFilter();
         const statusFilter = this.renderStatusFilter();
 
-        const { data, columns } = this.props;
+        const { data, columns, isSorting, isColumnFilter, isSelection, isExpand, isPagination, isColumnReorder } = this.props;
 
         const dynamicColumns = columns.map((col, i) => {
             if (col.type === 'date') {
-                return <Column key={col.field} field={col.field} header={col.header} body={this.dateBodyTemplate} sortable filter filterMatchMode="custom" filterFunction={this.filterDate} filterElement={dateFilter} />
+                return <Column key={col.field} field={col.field} header={col.header} body={this.dateBodyTemplate} sortable={isSorting} filter={isColumnFilter} filterMatchMode="custom" filterFunction={this.filterDate} filterElement={dateFilter} />
             } else if (col.type === 'status') {
-                return <Column key={col.field} field={col.field} header={col.header} body={this.statusBodyTemplate} sortable filter filterElement={statusFilter} />
+                return <Column key={col.field} field={col.field} header={col.header} body={this.statusBodyTemplate} sortable={isSorting} filter={isColumnFilter} filterElement={statusFilter} />
             } else if (col.type === 'progressbar') {
-                return <Column key={col.field} field={col.field} header={col.header} body={this.activityBodyTemplate} sortable filter filterMatchMode="gte" filterPlaceholder="Minimum" />
+                return <Column key={col.field} field={col.field} header={col.header} body={this.activityBodyTemplate} sortable={isSorting} filter={isColumnFilter} filterMatchMode="gte" filterPlaceholder="Minimum" />
             } else {
-                return <Column key={col.field} field={col.field} header={col.header} sortable filter filterMatchMode="contains" />
+                return <Column key={col.field} field={col.field} header={col.header} sortable={isSorting} filter={isColumnFilter} filterMatchMode="contains" />
             }
         });
 
-
         return (
+
             <div className="datatable-doc-demo" >
+                <Toast ref={(el) => { this.toast = el; }}></Toast>
                 <div className="card">
                     <DataTable ref={(el) => this.dt = el} value={data}
                         header={header} className="p-datatable-customers" dataKey="id" rowHover globalFilter={this.state.globalFilter}
                         selection={this.state.selectedCustomers} onSelectionChange={e => this.setState({ selectedCustomers: e.value })}
-                        paginator rows={10} emptyMessage="No data found" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" rowsPerPageOptions={[10, 25, 50]}>
-                        <Column selectionMode="multiple" style={{ width: '3em' }} />
+                        paginator={isPagination} rows={10} emptyMessage="No data found" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" rowsPerPageOptions={[10, 25, 50]}
+                        reorderableColumns={isColumnReorder} onColReorder={this.onColReorder}
+                        expandedRows={this.state.expandedRows} onRowToggle={(e) => this.setState({ expandedRows: e.data })}
+                        onRowExpand={this.onRowExpand} rowExpansionTemplate={this.rowExpansionTemplate}>
+                        {isSelection && <Column selectionMode="multiple" style={{ width: '3em' }} />}
+                        {isExpand && <Column expander style={{ width: '3em' }} />}
                         {dynamicColumns}
                     </DataTable>
                 </div>

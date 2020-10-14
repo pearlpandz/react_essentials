@@ -78,7 +78,7 @@
 
 /* temp */
 
-.customer-badge {
+.badge {
     border-radius: 2px;
     padding: .25em .5rem;
     text-transform: uppercase;
@@ -87,85 +87,67 @@
     letter-spacing: .3px;
 }
 
-.customer-badge.status-qualified {
+.badge.status-qualified {
     background-color: #C8E6C9;
     color: #256029;
 }
 
-.customer-badge.status-unqualified {
+.badge.status-unqualified {
     background-color: #FFCDD2;
     color: #C63737;
 }
 
-.customer-badge.status-negotiation {
+.badge.status-negotiation {
     background-color: #FEEDAF;
     color: #8A5340;
 }
 
-.customer-badge.status-new {
+.badge.status-new {
     background-color: #B3E5FC;
     color: #23547B;
 }
 
-.customer-badge.status-renewal {
+.badge.status-renewal {
     background-color: #ECCFFF;
     color: #694382;
 }
 
-.customer-badge.status-proposal {
+.badge.status-proposal {
     background-color: #FFD8B2;
     color: #805B36;
 }
 
-.product-badge {
-    border-radius: 2px;
-    padding: .25em .5rem;
-    text-transform: uppercase;
-    font-weight: 700;
-    font-size: 12px;
-    letter-spacing: .3px;
-}
-
-.product-badge.status-instock {
+.badge.status-instock {
     background: #C8E6C9;
     color: #256029;
 }
 
-.product-badge.status-outofstock {
+.badge.status-outofstock {
     background: #FFCDD2;
     color: #C63737;
 }
 
-.product-badge.status-lowstock {
+.badge.status-lowstock {
     background: #FEEDAF;
     color: #8A5340;
 }
 
-.order-badge {
-    border-radius: 2px;
-    padding: .25em .5rem;
-    text-transform: uppercase;
-    font-weight: 700;
-    font-size: 12px;
-    letter-spacing: .3px;
-}
-
-.order-badge.order-delivered {
+.badge.status-delivered {
     background: #C8E6C9;
     color: #256029;
 }
 
-.order-badge.order-cancelled {
+.badge.status-cancelled {
     background: #FFCDD2;
     color: #C63737;
 }
 
-.order-badge.order-pending {
+.badge.status-pending {
     background: #FEEDAF;
     color: #8A5340;
 }
 
-.order-badge.order-returned {
+.badge.status-returned {
     background: #ECCFFF;
     color: #694382;
 }
@@ -190,9 +172,17 @@
 }
 
 .p-column-filter {
-    width: 100%;
+        width: 100%;
 }
 
 .margin-zero {
     margin: 0;
+}
+
+.datatable-doc-demo .p-datatable-customers .p-datatable-tbody>tr>td .p-column-title {
+    display: block;
+}
+
+.datatable-doc-demo .p-datatable-customers .p-datatable-tbody>tr>td>.p-column-title {
+    display: none;
 }

@@ -1,0 +1,23 @@
+.p-sidebar-bottom {
+    height: auto;
+}
+
+.p-sidebar-content {
+    padding-bottom: 70px;
+    padding-left: 50px;
+    padding-right: 50px;
+}
+
+.child-p-r-30>* {
+    padding-right: 30px;
+}
+
+.p-field-checkbox label {
+    margin-left: 5px;
+}
+
+.customize-icon {
+    position: fixed;
+    right: 50px;
+    bottom: 50px;
+}
