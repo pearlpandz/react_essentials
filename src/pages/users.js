@@ -4,6 +4,7 @@ import { PrefixDataTable as DataTable } from './../resuables/datatable/datatable
 import { Sidebar } from 'primereact/sidebar';
 import { Button } from 'primereact/button';
 import { Checkbox } from 'primereact/checkbox';
+import { Tooltip } from 'primereact/tooltip';
 
 import './users.css';
 
@@ -531,7 +532,8 @@ export default class Users extends Component {
 
                 </Sidebar>
 
-                <Button icon="pi pi-cog" onClick={() => this.setState({ visibleBottom: true })} className="p-button-rounded p-button-danger customize-icon"  />
+                <Button icon="pi pi-cog" onClick={() => this.setState({ visibleBottom: true })} className="p-button-rounded p-button-danger customize-icon"  tooltip="Customize" tooltipOptions={{ position: 'bottom', mouseTrack: true, mouseTrackTop: 15 }} />
+                <Tooltip target=".logo" mouseTrack mouseTrackLeft={10} />
             </div>
         )
     }
